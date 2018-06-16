@@ -3,6 +3,7 @@
 
 #include <windows.h>
 
-#define uint64 UINT64
-#define uint32 UINT32
-#define uint16 UINT16
+typedef UINT64 uint64;
+typedef UINT32 uint32;
+typedef UINT16 uint16;
+typedef INT32 int32;

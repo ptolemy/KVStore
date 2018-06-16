@@ -144,13 +144,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="KVStore.cpp" />
+    <ClCompile Include="Model.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArgumentException.h" />
+    <ClInclude Include="BPlusTree.h" />
     <ClInclude Include="CommonTypes.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="IFile.h" />
     <ClInclude Include="IOException.h" />
     <ClInclude Include="IPage.h" />
+    <ClInclude Include="IPageManager.h" />
+    <ClInclude Include="Models.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Win32Exception.h" />
     <ClInclude Include="WinPageFile.h" />
   </ItemGroup>

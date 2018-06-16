@@ -2,45 +2,74 @@
 
 #include "CommonTypes.h"
 
-class IPage {
-public:
-    const static uint64 PageSize = 8192;
-};
+namespace KVStore {
+    namespace DataStructure {
+        // DataStructure for the B+ Tree
+        const static uint64 PageSize = 8192;
 
-typedef struct
-{
-    uint64 PageId;
-    uint16 PageType;
-    uint16 AvailableSize;    
-    byte data[IPage::PageSize - sizeof(uint16) - sizeof(uint16) - sizeof(uint64)];
-} OnDiskPage, *POnDiskPage;
+        typedef enum: byte {
+            MetadataPageType,
+            IndexPageType,
+            IndexLeafPageType,
+            DataPageType,
+        } PageType;
+
+        typedef struct {
+            uint32 PageId;
+            uint32 Version;
+        } PageId, *PPageId;
+
+        typedef struct {
+            PageId Id;
+            PageType Type;  // 1byte
+            uint16 FreeBytes;
+            byte Reserved[5];
+        } PageHeader, *PPageHeader;
+
+        typedef struct {
+            PageHeader PHeader;
+            byte Data[PageSize - sizeof(PageHeader)];
+        } PhysicalPage, *PPhysicalPage;
 
 
-typedef struct {
-    uint64 PageId;
-    uint16 KeyLength;
-} EntryHeader, *PEntryHeader;
+        /*
+            Linked Page Struct should be like:
+            |<-     Header(8byte)        ->|<-          Entry1                 ->|<-          Entry2                 ->| .......  Entry n ->| NotUsed |
+            | Type | Reserved | FatherPage | SonPage1 | KeyLength1 | ... Key1 ...| SonPage2 | KeyLength2 | ... Key2 ...| ......| ...Key n...| NotUsed |
+        */
 
-typedef struct {
-    void *Key;
-    uint16 KeyLength;
-}Key, *PKey;
+        typedef struct{
+            PageHeader PageHeader;
+            PageId Father; // 8 byte
+        } IndexPageHeader, *PIndexPageHeader;
 
-class LinkEntry 
-{
-    // Logically struct of LinkEntry: KeyLength(2byte) + NextPage + Key
-public:
-    LinkEntry(void *ptr): m_basePtr(ptr)
-    { }
+        typedef struct {
+            IndexPageHeader LPageHeader;
+            byte Data[PageSize - sizeof(IndexPageHeader)];
+        } IndexPage, *PIndexPage;
 
-    uint16 GetKeySize() {
+        typedef struct {
+            PageId Son;    // Point to Next Level Page
+            uint16 KeyLength;
+        } IndexEntryHeader, *PIndexEntryHeader;
+         
+        typedef struct {
+            IndexPageHeader IndexPageHeader;
+            PageId RightPage;
+        } IndexLeafPageHeader, *PIndexLeafPageHeader;
 
+        typedef struct {
+            PageId PageId;
+            uint16 PageOffset;
+        } DataItemLink;
+
+        typedef struct {
+            DataItemLink DataLink;
+            uint16 KeyLength;
+        } IndexLeafEntryHeader;
+
+        typedef struct DateItemHeader {
+            uint16 DataSegmentSize;
+        } DateItemHeader;
     }
-
-
-private:
-    void *m_basePtr;
-};
-
-// LinkPage, LeafPage, DataPage for B+Tree
-//class 
+}
